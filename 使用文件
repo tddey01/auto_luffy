@@ -1,0 +1,95 @@
+RBAC组件使用文档
+
+
+1 将RBAC组件拷贝到项目中
+
+2 将RBAC目录下的migrations目录中的数据文件记录删除
+
+3 业务开发
+
+    3.1  对于用户表处理 o2o将用户表拆分到两张表中 如：
+    ----- rbac 用户表
+            class UserInfo(models.Model):
+    """
+    用户表
+    """
+    name = models.CharField(verbose_name='用户名', max_length=32)
+    password = models.CharField(verbose_name='密码', max_length=64)
+    email = models.CharField(verbose_name='邮箱', max_length=32)
+    roles = models.ManyToManyField(verbose_name='拥有的所有角色', to='Role', blank=True, )
+
+    def __str__(self):
+        return self.name
+
+    -------app 用户表
+
+    class UserInfo(models.Model):
+    '''
+    用户表
+    '''
+    user = models.OneToOneField(verbose_name='用户', to=RbacUserInfo, on_delete=models.CASCADE)
+    phone = models.CharField(verbose_name='联系方式', max_length=32)
+    lavel_choices = (
+        (1, 'T1'),
+        (2, 'T2'),
+        (3, 'T3'),
+    )
+    level = models.IntegerField(verbose_name='部门', choices=lavel_choices)
+    depart = models.ForeignKey(verbose_name='部门', to='Department', on_delete=models.CASCADE)
+
+    def __init__(self):
+        return self.user.name
+
+    缺点 用户数据分散
+
+    优点  利用上rbac中的用户管理的功能
+
+  3.2 将用户表整合到一张表  （推荐使用这个方法）
+  rbac/models.py
+        class UserInfo(models.Model):
+    '''
+    用户表
+    '''
+    # user = models.OneToOneField(verbose_name='用户', to=RbacUserInfo, on_delete=models.CASCADE)
+    name = models.CharField(verbose_name='用户名', max_length=32)
+    password = models.CharField(verbose_name='密码', max_length=64)
+    email = models.CharField(verbose_name='邮箱', max_length=32)
+    roles = models.ManyToManyField(verbose_name='拥有的所有角色', to='Role', blank=True, )
+
+    def __init__(self):
+        return self.user.name
+
+    class Meta:
+        # django 在以后再做数据库迁移时，不再为UserInfo类创建相关的表及表结构了
+        # 此类可以当做 '父类' 别其他Model类继承 ，过度给他类
+        abstract = True
+
+  ---
+  业务/models.py
+  class UserInfo(RbacUserInfo):
+    '''
+    用户表
+    '''
+    # user = models.OneToOneField(verbose_name='用户', to=RbacUserInfo, on_delete=models.CASCADE)
+
+    phone = models.CharField(verbose_name='联系方式', max_length=32)
+    lavel_choices = (
+        (1, 'T1'),
+        (2, 'T2'),
+        (3, 'T3'),
+    )
+    level = models.IntegerField(verbose_name='部门', choices=lavel_choices)
+    depart = models.ForeignKey(verbose_name='部门', to='Department', on_delete=models.CASCADE)
+
+    def __init__(self):
+        return self.user.name
+
+  优点  将所有的用户信息放到一张表(业务的用户表中)
+  缺点  在rbac中所有关于用户表的操作，不能使用了
+
+  注意事项：
+    rbac中两处使用了用户表
+       - 用户管理
+       - 权限分配时用户列表 [读取业务中的用户表即可，]
+
+

@@ -12,11 +12,11 @@ urlpatterns = [
     url(r'^role/del/(?P<pk>\d+)/$', role.role_del, name='role_del'),  # rbac:role_del
     url(r'^role/edit/(?P<pk>\d+)/$', role.role_edit, name='role_edit'),  # rbac:role_edit
 
-    url(r'^user/list/$', user.user_list, name='user_list'),  # rbac:user_list
-    url(r'^user/add/$', user.user_add, name='user_add'),  # rbac:user_add
-    url(r'^user/del/(?P<pk>\d+)/$', user.user_del, name='user_del'),  # rbac:user_del
-    url(r'^user/reset/password/(?P<pk>\d+)/$', user.user_reset_password, name='user_reset_password'),
-    url(r'^user/edit/(?P<pk>\d+)/$', user.user_edit, name='user_edit'),  # rbac:user_edit
+    # url(r'^user/list/$', user.user_list, name='user_list'),  # rbac:user_list
+    # url(r'^user/add/$', user.user_add, name='user_add'),  # rbac:user_add
+    # url(r'^user/del/(?P<pk>\d+)/$', user.user_del, name='user_del'),  # rbac:user_del
+    # url(r'^user/reset/password/(?P<pk>\d+)/$', user.user_reset_password, name='user_reset_password'),
+    # url(r'^user/edit/(?P<pk>\d+)/$', user.user_edit, name='user_edit'),  # rbac:user_edit
 
     # 一级菜单
     url(r'^menu/list/$', menu.menu_list, name='menu_list'),  # rbac:menu_list

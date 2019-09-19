@@ -5,6 +5,8 @@ from django.shortcuts import HttpResponse
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.forms import formset_factory
+from django.conf import settings
+from django.utils.module_loading import import_string  #
 
 # from django.urls import reverse
 from rbac import models
@@ -417,8 +419,10 @@ def distribute_permissions(request):
     :return:
     '''
 
+    # 业务中的用户表 'app.models.UserInfo'
     user_id = request.GET.get('uid')
-    user_object = models.UserInfo.objects.filter(id=user_id).first()
+    user_models_class = import_string(settings.RBAC_USER_MODEL_CLASS)
+    user_object = user_models_class.objects.filter(id=user_id).first()
 
     if not user_object:
         user_id = None
@@ -469,7 +473,7 @@ def distribute_permissions(request):
     user_has_roles_dict = {item.id: None for item in user_has_roles}
 
 
-    all_user_list = models.UserInfo.objects.all()
+    all_user_list = user_models_class.objects.all()
     all_role_list = models.Role.objects.all()
 
     menu_permsissions_list = []

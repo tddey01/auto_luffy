@@ -161,7 +161,10 @@
 
     </div>
     <div class="right-body">
-        {% breadcrumb request %}
+        <div>
+            {% breadcrumb request %}
+        </div>
+
         {% block content %} {% endblock %}
     </div>
 </div>

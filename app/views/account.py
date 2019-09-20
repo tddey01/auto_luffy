@@ -1,17 +1,33 @@
 #!/usr/bin/env  python3
 # -*- coding: UTF-8 -*-
 
-from django.shortcuts import render
+from django.shortcuts import render,redirect
+from rbac.services.init_permission import init_permission
 from app import models
 
 def login(request):
     if request.method == 'GET':
-        return render(request,'login.html')
+        return render(request, 'login.html')
 
-    user = request.POST.get('usernaem')
-    pwd =  request.POST.get('password')
+    user = request.POST.get('username')
+    pwd = request.POST.get('password')
 
-    models.UserInfo.objects.filter(name=user,password=pwd).first()
+    user_object = models.UserInfo.objects.filter(name=user, password=pwd).first()
+    if not user_object:
+        return render(request, 'login.html', {'error': '用户名或密码错误'})
+
+    # 用户权限信息的初始化
+    init_permission(user_object,request)
+
+    return redirect('/index/')
+
+
 
 def  logout(request):
-    pass
+     request.session.delete()
+     return redirect('/login/')
+
+
+def index(request):
+
+    return render(request,'index.html')

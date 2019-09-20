@@ -15,7 +15,7 @@ from rbac.forms.Menu import SecondMenuModelForms
 from rbac.forms.Menu import PermissionModelForms
 from rbac.forms.Menu import MultiAddPermissionForm
 from rbac.forms.Menu import MultiEditPermissionForm
-from rbac.services.Menu_urls import memory_resverse
+from rbac.services.Menu_urls import memory_reverse
 from rbac.services.routes import get_all_url_dict
 from collections import OrderedDict
 
@@ -80,7 +80,7 @@ def menu_add(request):
         # if origin_params:
         #     url = "%s?%s" %(url,origin_params)
 
-        return redirect(memory_resverse(request, 'rbac:menu_list'))
+        return redirect(memory_reverse(request, 'rbac:menu_list'))
 
     return render(request, 'rbac/change.html', {'form': form})
 
@@ -110,7 +110,7 @@ def menu_edit(request, pk):
         # if origin_params:
         #     url = "%s?%s" %(url,origin_params)
         # return redirect(url)
-        return redirect(memory_resverse(request, 'rbac:menu_list'))
+        return redirect(memory_reverse(request, 'rbac:menu_list'))
 
     return render(request, 'rbac/change.html', {'form': form})
 
@@ -127,7 +127,7 @@ def menu_del(request, pk):
     # origin_params = request.GET.get("_filter")
     # if origin_params:
     #     url = "%s?%s" % (url, origin_params)
-    url = memory_resverse(request, 'rbac:menu_list')
+    url = memory_reverse(request, 'rbac:menu_list')
     if request.method == 'GET':
         return render(request, 'rbac/delete.html', {'cancel_url': url})
 
@@ -153,7 +153,7 @@ def second_menu_add(request, menu_id):
     if form.is_valid():
         form.save()
 
-        return redirect(memory_resverse(request, 'rbac:menu_list'))
+        return redirect(memory_reverse(request, 'rbac:menu_list'))
 
     return render(request, 'rbac/change.html', {'form': form})
 
@@ -174,7 +174,7 @@ def second_menu_edit(request, pk):
     form = SecondMenuModelForms(data=request.POST, instance=Permission_object)
     if form.is_valid():
         form.save()
-        return redirect(memory_resverse(request, 'rbac:menu_list'))
+        return redirect(memory_reverse(request, 'rbac:menu_list'))
 
     return render(request, 'rbac/change.html', {'form': form})
 
@@ -186,7 +186,7 @@ def second_menu_del(request, pk):
     :param pk:
     :return:
     '''
-    url = memory_resverse(request, 'rbac:menu_list')
+    url = memory_reverse(request, 'rbac:menu_list')
     if request.method == 'GET':
         return render(request, 'rbac/delete.html', {'cancel_url': url})
 
@@ -220,7 +220,7 @@ def permission_add(request, second_menu_id):
         # instance.save()
 
         form.save()
-        return redirect(memory_resverse(request, 'rbac:menu_list'))
+        return redirect(memory_reverse(request, 'rbac:menu_list'))
 
     return render(request, 'rbac/change.html', {'form': form})
 
@@ -241,7 +241,7 @@ def permission_edit(request, pk):
     form = PermissionModelForms(data=request.POST, instance=permission_object)
     if form.is_valid():
         form.save()
-        return redirect(memory_resverse(request, 'rbac:menu_list'))
+        return redirect(memory_reverse(request, 'rbac:menu_list'))
 
     return render(request, 'rbac/change.html', {'form': form})
 
@@ -254,7 +254,7 @@ def permission_del(request, pk):
     :return:
     '''
 
-    url = memory_resverse(request, 'rbac:menu_list')
+    url = memory_reverse(request, 'rbac:menu_list')
     if request.method == 'GET':
         return render(request, 'rbac/delete.html', {'cancel_url': url})
 
@@ -404,7 +404,7 @@ def multi_permissions_del(request, pk):
     :param pk:
     :return:
     '''
-    url = memory_resverse(request, 'rbac:multi_permissions')
+    url = memory_reverse(request, 'rbac:multi_permissions')
     if request.method == 'GET':
         return render(request, 'rbac/delete.html', {'cancel_url': url})
 

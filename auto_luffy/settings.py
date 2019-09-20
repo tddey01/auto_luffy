@@ -15,7 +15,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
@@ -26,7 +25,6 @@ SECRET_KEY = 'pg%8d)0gl_h=&@mel(_&d1x*3=0fba*3#c0xp&sr!c(y)x-2or'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -73,7 +71,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'auto_luffy.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
@@ -83,7 +80,6 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -103,7 +99,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
@@ -116,7 +111,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
@@ -141,14 +135,13 @@ LOGGING = {
     },
 }
 
-
 # - - - - -  - 全新相关配置 - - - - - -
 # 业务中的用户表
 RBAC_USER_MODEL_CLASS = 'app.models.UserInfo'
 
 # 权限在Session中存储的key
 PERMISSION_SISSION_KEY = 'luffy_permission_list_url_key'
-#菜单在Session的中存储key
+# 菜单在Session的中存储key
 MENU_SISSION_KEY = 'luffy_permission_menu_key'
 
 # 白名单
@@ -156,7 +149,6 @@ VALID_URL_LIST = [
     '/login/',
     '/admin/.*',
 ]
-
 
 # 自动发现路由中URL时，排除的URL
 AUTO_DEISCOVER_EXCLUDE = [

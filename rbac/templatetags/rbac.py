@@ -6,10 +6,9 @@ import re
 from django.template import Library
 from django.conf import settings
 from collections import OrderedDict
-from django.http import QueryDict
-from django.urls import reverse
 
-from rbac.services import  Menu_urls
+from rbac.services import Menu_urls
+
 register = Library()
 
 
@@ -34,18 +33,11 @@ def multi_menu(request):
     # print(request.current_selected_permission,type(request.current_selected_permission))
     # 对字典的key进行排序
     key_list = sorted(menu_dict)
-
     # 空的有序字典
     ordered_dict = OrderedDict()
     for key in key_list:
         val = menu_dict[key]
         val['class'] = 'hide'
-        # for per in val['children']:
-        #     regex = '%s$'% ([per['url']])
-        #     if re.match(regex, request.path_info):
-        #         per['class'] = 'active'
-        #         val['class'] = ''
-        # ordered_dict[key] = val
         for per in val['children']:
             if per['id'] == request.current_selected_permission:
                 per['class'] = 'active'
@@ -80,15 +72,4 @@ def memory_cul(request, name, *args, **kwargs):
     :param name:
     :return:
     '''
-    # basic_url = reverse(name, args=args, kwargs=kwargs)
-    #
-    # # 当前URL中无参数
-    # if not request.GET:
-    #     return basic_url
-    #
-    # query_dict = QueryDict(mutable=True)
-    # query_dict['_filter'] = request.GET.urlencode()
-    # # query_dict.urlencode() # filter=mid=26&age=99
-    #
-    # return "%s?%s" % (basic_url, query_dict.urlencode())
     return Menu_urls.memory_cul(request, name, *args, **kwargs)

@@ -4,7 +4,6 @@ from rbac.models import UserInfo as RbacUserInfo
 # Create your models here.
 
 '''
-
 '''
 
 
@@ -14,7 +13,7 @@ class Department(models.Model):
     '''
     title = models.CharField(verbose_name='部门', max_length=32)
 
-    def __init__(self):
+    def __str__(self):
         return self.title
 
 
@@ -33,8 +32,7 @@ class UserInfo(RbacUserInfo):
     level = models.IntegerField(verbose_name='部门', choices=lavel_choices)
     depart = models.ForeignKey(verbose_name='部门', to='Department', on_delete=models.CASCADE)
 
-    def __init__(self):
-         return self.name
+
 
 
 class Host(models.Model):
@@ -45,5 +43,5 @@ class Host(models.Model):
     ip = models.GenericIPAddressField(verbose_name='IP', protocol='both')
     depart = models.ForeignKey(verbose_name='归属部门', to='Department', on_delete=models.CASCADE)
 
-    def __init__(self):
+    def __str__(self):
         return self.hostname

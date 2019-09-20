@@ -16,9 +16,25 @@ Including another URLconf
 from django.contrib import admin
 from django.conf.urls import url
 from app.views import User_name
+from app.views import host_name
+from app.views import account
+from django.urls import re_path
 
 urlpatterns = [
     url('admin/', admin.site.urls),
-    url(r'^user/list/$', User_name.user_list, name='user_list' ), # 用户列表
-    url(r'^user/add/$', User_name.user_add, name='user_add'),  #添加用户
+
+    url(r'^login/$', account.login, name='login'),  # 用户登录页面
+    url(r'^logout/$', account.logout, name='logout'),  # 用户注销页面
+    # 用户区域
+    url(r'^user/list/$', User_name.user_list, name='user_list'),  # 用户列表
+    url(r'^user/add/$', User_name.user_add, name='user_add'),  # 添加用户
+    url(r'^user/edit/(?P<pk>\d+)/$', User_name.user_edit, name='user_edit'),  # 编辑用户
+    url(r'^user/reset/password/(?P<pk>\d+)/$', User_name.user_reset_password, name='user_reset_password'),  # 修改密码用户
+    url(r'^user/del/(?P<pk>\d+)/$', User_name.user_del, name='user_del'),  # 删除用户
+
+    # 主机区域
+    url(r'^host/list/$', host_name.host_list, name='host_list'),  # 用户列表
+    url(r'^host/add/$', host_name.host_add, name='host_add'),  # 添加用户
+    url(r'^host/edit/(?P<pk>\d+)/$', host_name.host_edit, name='host_edit'),  # 编辑用户
+    url(r'^host/del/(?P<pk>\d+)/$', host_name.host_del, name='host_del'),  # 删除用户
 ]

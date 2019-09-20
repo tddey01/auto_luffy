@@ -49,6 +49,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'rbac.middlewares.rbac.MiddlewareMixin',
 ]
 
 ROOT_URLCONF = 'auto_luffy.urls'
@@ -144,3 +145,20 @@ LOGGING = {
 # - - - - -  - 全新相关配置 - - - - - -
 # 业务中的用户表
 RBAC_USER_MODEL_CLASS = 'app.models.UserInfo'
+
+# 权限在Session中存储的key
+PERMISSION_SISSION_KEY = 'luffy_permission_list_url_key'
+#菜单在Session的中存储key
+MENU_SISSION_KEY = 'luffy_permission_menu_key'
+
+# 白名单
+VALID_URL_LIST = [
+    '/login/',
+    '/admin/.*',
+]
+
+
+# 自动发现路由中URL时，排除的URL
+AUTO_DEISCOVER_EXCLUDE = [
+    '/admin/.*',
+]

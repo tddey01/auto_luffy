@@ -26,7 +26,7 @@ def memory_cul(request, name, *args, **kwargs):
     return "%s?%s" % (basic_url, query_dict.urlencode())
 
 
-def memory_resverse(request, name, *args, **kwargs):
+def memory_reverse(request, name, *args, **kwargs):
 
     '''
     反向生成URL

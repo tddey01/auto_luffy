@@ -101,7 +101,57 @@ RBAC组件使用文档
     - 用户表的增删改查
     - 主机表的增删改查
 
+    感受 比啊内心业务功能是 出现大量拷贝
+
  注意 如果要是rbac中的模板  怎需要将模板中的 导航条 + 菜单 当业务上线之前开发完成之后 上线之前再把他拿回来
+     {% multi_menu request %}
+     {% breadcrumb request %}
+
+
+4 权限应用
+    4.1  将菜单和导航条添加到loyou.html中
+    """
+    <div class="pg-body">
+    <div class="left-menu">
+        <div class="menu-body">
+            {% multi_menu request %}
+        </div>
+
+    </div>
+    <div class="right-body">
+        {% breadcrumb request %}
+        {% block content %} {% endblock %}
+    </div>
+    </div>
+    """
+    4.2 应用的中间
+
+        MIDDLEWARE = [
+            'django.middleware.security.SecurityMiddleware',
+            'django.contrib.sessions.middleware.SessionMiddleware',
+            'django.middleware.common.CommonMiddleware',
+            'django.middleware.csrf.CsrfViewMiddleware',
+            'django.contrib.auth.middleware.AuthenticationMiddleware',
+            'django.contrib.messages.middleware.MessageMiddleware',
+            'django.middleware.clickjacking.XFrameOptionsMiddleware',
+            'rbac.middlewares.rbac.MiddlewareMixin',
+        ]
+    4.3 白名单处理  settins.py  中添加一下配置
+            VALID_URL_LIST = [
+                '/login/',
+                '/admin/.*',
+            ]
+
+    4.4 权限初始化 在setting，py添加一下配置
+
+            PERMISSION_SISSION_KEY = 'luffy_permission_list_url_key'
+            MENU_SISSION_KEY = 'luffy_permission_menu_key'
+    4.5 批量操作权限时，自动发现路由中的所有URL时，应该排除的URL
+            AUTO_DEISCOVER_EXCLUDE = [
+                '/admin/.*',
+            ]
+    4.6 用户登录逻辑
+
 
 
 

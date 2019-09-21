@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 from django.shortcuts import render, redirect, HttpResponse
-from app import models
-from app.forms.users import UserModelForms,UpdateUserModelForms ,ResetPasswordUserModelForms
-from rbac.services.Menu_urls import memory_reverse
+from app01 import models
+from app01.forms.user import UserModelForm, UpdateUserModelForm, ResetPasswordUserModelForm
+from rbac.service.urls import memory_reverse
 
 
 def user_list(request):
@@ -25,10 +25,10 @@ def user_add(request):
     :return:
     """
     if request.method == 'GET':
-        form = UserModelForms()
+        form = UserModelForm()
         return render(request, 'rbac/change.html', {'form': form})
 
-    form = UserModelForms(data=request.POST)
+    form = UserModelForm(data=request.POST)
     if form.is_valid():
         form.save()
         return redirect(memory_reverse(request, 'user_list'))
@@ -47,10 +47,10 @@ def user_edit(request, pk):
     if not obj:
         return HttpResponse('用户不存在')
     if request.method == 'GET':
-        form = UpdateUserModelForms(instance=obj)
+        form = UpdateUserModelForm(instance=obj)
         return render(request, 'rbac/change.html', {'form': form})
 
-    form = UpdateUserModelForms(instance=obj, data=request.POST)
+    form = UpdateUserModelForm(instance=obj, data=request.POST)
     if form.is_valid():
         form.save()
         return redirect(memory_reverse(request, 'user_list'))
@@ -58,7 +58,7 @@ def user_edit(request, pk):
     return render(request, 'rbac/change.html', {'form': form})
 
 
-def user_reset_password(request, pk):
+def user_reset_pwd(request, pk):
     """
     重置密码
     :param request:
@@ -69,10 +69,10 @@ def user_reset_password(request, pk):
     if not obj:
         return HttpResponse('用户不存在')
     if request.method == 'GET':
-        form = ResetPasswordUserModelForms()
+        form = ResetPasswordUserModelForm()
         return render(request, 'rbac/change.html', {'form': form})
 
-    form = ResetPasswordUserModelForms(instance=obj, data=request.POST)
+    form = ResetPasswordUserModelForm(instance=obj, data=request.POST)
     if form.is_valid():
         form.save()
         return redirect(memory_reverse(request, 'user_list'))

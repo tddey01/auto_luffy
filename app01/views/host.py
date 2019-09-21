@@ -1,50 +1,46 @@
-#!/usr/bin/env  python3
-# -*- coding: UTF-8 -*-
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+from django.shortcuts import render, redirect, HttpResponse
+from app01 import models
+from app01.forms.host import HostModelForm
+from rbac.service.urls import memory_reverse
 
-from django.shortcuts import  redirect,render,HttpResponse
-from app.forms.hosts import HostModelForms
-from rbac.services.Menu_urls import  memory_reverse
-
-# 数据库操作
-from app import models
 
 def host_list(request):
     host_queryset = models.Host.objects.all()
-    return render(request,'host_list.html',{'host_list':host_queryset})
+    return render(request, 'host_list.html', {"host_queryset": host_queryset})
+
 
 def host_add(request):
-    """
-    添加主机
-    :param request:
-    :return:
-    """
     if request.method == 'GET':
-        form = HostModelForms()
+        form = HostModelForm()
         return render(request, 'rbac/change.html', {'form': form})
 
-    form = HostModelForms(data=request.POST)
+    form = HostModelForm(data=request.POST)
     if form.is_valid():
         form.save()
         return redirect(memory_reverse(request, 'host_list'))
 
     return render(request, 'rbac/change.html', {'form': form})
 
-def host_edit(request,pk):
+
+def host_edit(request, pk):
     obj = models.Host.objects.filter(id=pk).first()
     if not obj:
         return HttpResponse('主机不存在')
     if request.method == 'GET':
-        form = HostModelForms(instance=obj)
+        form = HostModelForm(instance=obj)
         return render(request, 'rbac/change.html', {'form': form})
 
-    form = HostModelForms(instance=obj, data=request.POST)
+    form = HostModelForm(instance=obj, data=request.POST)
     if form.is_valid():
         form.save()
         return redirect(memory_reverse(request, 'host_list'))
 
     return render(request, 'rbac/change.html', {'form': form})
 
-def host_del(request,pk):
+
+def host_del(request, pk):
     origin_url = memory_reverse(request, 'host_list')
     if request.method == 'GET':
         return render(request, 'rbac/delete.html', {'cancel': origin_url})

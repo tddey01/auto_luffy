@@ -24,7 +24,7 @@ class UserInfo(RbacUserInfo):
     )
     level = models.IntegerField(verbose_name='级别', choices=level_choices)
 
-    depart = models.ForeignKey(verbose_name='部门', to='Department',on_delete=models.CASCADE)
+    depart = models.ForeignKey(verbose_name='部门', to='Department')
 
 
 class Host(models.Model):
@@ -33,7 +33,7 @@ class Host(models.Model):
     """
     hostname = models.CharField(verbose_name='主机名', max_length=32)
     ip = models.GenericIPAddressField(verbose_name='IP', protocol='both')
-    depart = models.ForeignKey(verbose_name='归属部门', to='Department',on_delete=models.CASCADE)
+    depart = models.ForeignKey(verbose_name='归属部门', to='Department')
 
     def __str__(self):
         return self.hostname

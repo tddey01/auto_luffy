@@ -1,9 +1,9 @@
-#!/usr/bin/env  python3
-# -*- coding: UTF-8 -*-
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+from django.shortcuts import render, redirect
+from app01 import models
+from rbac.service.init_permission import init_permission
 
-from django.shortcuts import render,redirect
-from rbac.services.init_permission import init_permission
-from app import models
 
 def login(request):
     if request.method == 'GET':
@@ -17,17 +17,25 @@ def login(request):
         return render(request, 'login.html', {'error': '用户名或密码错误'})
 
     # 用户权限信息的初始化
-    init_permission(user_object,request)
+    init_permission(user_object, request)
 
     return redirect('/index/')
 
 
-
-def  logout(request):
-     request.session.delete()
-     return redirect('/login/')
+def logout(request):
+    """
+    注销
+    :param request:
+    :return:
+    """
+    request.session.delete()
+    return redirect('/login/')
 
 
 def index(request):
-
-    return render(request,'index.html')
+    """
+    首页
+    :param request:
+    :return:
+    """
+    return render(request, 'index.html')

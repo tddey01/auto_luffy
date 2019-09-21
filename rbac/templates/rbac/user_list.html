@@ -1,5 +1,5 @@
 {% extends 'layout.html' %}
-{% load rbac %}
+
 
 {% block content %}
     <div class="luffy-container">
@@ -28,7 +28,7 @@
                     <td>{{ row.name }}</td>
                     <td>{{ row.email }}</td>
                     <td>
-                        <a href="{% url 'rbac:user_reset_password' pk=row.id %}">重置密码</a>
+                        <a href="{% url 'rbac:user_reset_pwd' pk=row.id %}">重置密码</a>
                     </td>
                     <td>
 

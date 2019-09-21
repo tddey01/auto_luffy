@@ -1,7 +1,6 @@
-#!/usr/bin/env  python3
-# -*- coding: UTF-8 -*-
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
 from django import forms
-
 from django.utils.safestring import mark_safe
 from rbac import models
 from rbac.forms.base import BootStrapModelForm
@@ -39,15 +38,13 @@ ICON_LIST = [
     ['fa-reply-all', '<i aria-hidden="true" class="fa fa-reply-all"></i>'],
     ['fa-retweet', '<i aria-hidden="true" class="fa fa-retweet"></i>'],
     ['fa-wrench', '<i aria-hidden="true" class="fa fa-wrench"></i>']]
-
 for item in ICON_LIST:
     item[1] = mark_safe(item[1])
 
 
-class MenuModelForms(forms.ModelForm):
+class MenuModelForm(forms.ModelForm):
     class Meta:
         model = models.Menu
-        # fields = '__all__'
         fields = ['title', 'icon']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
@@ -58,13 +55,13 @@ class MenuModelForms(forms.ModelForm):
         }
 
 
-class SecondMenuModelForms(BootStrapModelForm):
+class SecondMenuModelForm(BootStrapModelForm):
     class Meta:
         model = models.Permission
         exclude = ['pid']
 
 
-class PermissionModelForms(BootStrapModelForm):
+class PermissionModelForm(BootStrapModelForm):
     class Meta:
         model = models.Permission
         fields = ['title', 'name', 'url']

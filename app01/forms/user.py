@@ -3,10 +3,10 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
-from app import models
+from app01 import models
 
 
-class UserModelForms(forms.ModelForm):
+class UserModelForm(forms.ModelForm):
     confirm_password = forms.CharField(label='确认密码')
 
     class Meta:
@@ -14,7 +14,7 @@ class UserModelForms(forms.ModelForm):
         fields = ['name', 'password', 'confirm_password', 'email', 'phone', 'level', 'depart', 'roles']
 
     def __init__(self, *args, **kwargs):
-        super(UserModelForms, self).__init__(*args, **kwargs)
+        super(UserModelForm, self).__init__(*args, **kwargs)
         # 统一给ModelForm生成字段添加样式
         for name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
@@ -31,19 +31,19 @@ class UserModelForms(forms.ModelForm):
         return confirm_password
 
 
-class UpdateUserModelForms(forms.ModelForm):
+class UpdateUserModelForm(forms.ModelForm):
     class Meta:
         model = models.UserInfo
         exclude = ['password',]
 
     def __init__(self, *args, **kwargs):
-        super(UpdateUserModelForms, self).__init__(*args, **kwargs)
+        super(UpdateUserModelForm, self).__init__(*args, **kwargs)
         # 统一给ModelForm生成字段添加样式
         for name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
 
 
-class ResetPasswordUserModelForms(forms.ModelForm):
+class ResetPasswordUserModelForm(forms.ModelForm):
     confirm_password = forms.CharField(label='确认密码')
 
     class Meta:
@@ -51,7 +51,7 @@ class ResetPasswordUserModelForms(forms.ModelForm):
         fields = ['password', 'confirm_password']
 
     def __init__(self, *args, **kwargs):
-        super(ResetPasswordUserModelForms, self).__init__(*args, **kwargs)
+        super(ResetPasswordUserModelForm, self).__init__(*args, **kwargs)
         # 统一给ModelForm生成字段添加样式
         for name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'

@@ -4,12 +4,8 @@
             {% if item.class %}
                 <li class="active">{{ item.title }}</li>
             {% else %}
-                 <li class="{{ itme.class }}"><a href="{{ item.url }}">{{ item.title }}</a></li>
+                <li><a href="{{ item.url }}">{{ item.title }}</a></li>
             {% endif %}
         {% endfor %}
-
-        {#                <li><a href="#">首页</a></li>#}
-        {#                <li class="active">客户管理</li>#}
-
     </ol>
 </div>

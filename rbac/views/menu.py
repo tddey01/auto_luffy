@@ -1,64 +1,57 @@
-#!/usr/bin/env  python3
-# -*- coding: UTF-8 -*-
-
-from django.shortcuts import HttpResponse
-from django.shortcuts import render
-from django.shortcuts import redirect
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+from collections import OrderedDict
+from django.shortcuts import render, redirect, HttpResponse
 from django.forms import formset_factory
 from django.conf import settings
-from django.utils.module_loading import import_string  #
+from django.utils.module_loading import import_string
 
-# from django.urls import reverse
 from rbac import models
-from rbac.forms.Menu import MenuModelForms
-from rbac.forms.Menu import SecondMenuModelForms
-from rbac.forms.Menu import PermissionModelForms
-from rbac.forms.Menu import MultiAddPermissionForm
-from rbac.forms.Menu import MultiEditPermissionForm
-from rbac.services.Menu_urls import memory_reverse
-from rbac.services.routes import get_all_url_dict
-from collections import OrderedDict
+from rbac.forms.menu import MenuModelForm, SecondMenuModelForm, PermissionModelForm, MultiAddPermissionForm, \
+    MultiEditPermissionForm
+from rbac.service.urls import memory_reverse
+from rbac.service.routes import get_all_url_dict
 
 
 def menu_list(request):
-    '''
+    """
     菜单和权限列表
     :param request:
     :return:
-    '''
+    """
 
     menus = models.Menu.objects.all()
-
     menu_id = request.GET.get('mid')  # 用户选择的一级菜单
     second_menu_id = request.GET.get('sid')  # 用户选择的二级菜单
 
-    menu_exists = models.Menu.objects.filter(id=menu_id).exists()  # 查看标的id
+    menu_exists = models.Menu.objects.filter(id=menu_id).exists()
     if not menu_exists:
         menu_id = None
-
     if menu_id:
-        second_menu = models.Permission.objects.filter(menu_id=menu_id)
+        second_menus = models.Permission.objects.filter(menu_id=menu_id)
     else:
-        second_menu = []
+        second_menus = []
 
-    second_menu_exists = models.Permission.objects.filter(id=second_menu_id).exists()  # 查看标的id
+    second_menu_exists = models.Permission.objects.filter(id=second_menu_id).exists()
     if not second_menu_exists:
         second_menu_id = None
 
     if second_menu_id:
-        permission = models.Permission.objects.filter(pid_id=second_menu_id)
+        permissions = models.Permission.objects.filter(pid_id=second_menu_id)
     else:
-        permission = []
+        permissions = []
 
     return render(
-        request, 'rbac/menu_list.html',
+        request,
+        'rbac/menu_list.html',
         {
             'menus': menus,
-            'second_menu': second_menu,
-            'permission': permission,
+            'second_menus': second_menus,
+            'permissions': permissions,
             'menu_id': menu_id,
             'second_menu_id': second_menu_id,
-        })
+        }
+    )
 
 
 def menu_add(request):
@@ -67,69 +60,50 @@ def menu_add(request):
     :param request:
     :return:
     """
-
     if request.method == 'GET':
-        form = MenuModelForms()
+        form = MenuModelForm()
         return render(request, 'rbac/change.html', {'form': form})
 
-    form = MenuModelForms(data=request.POST)
+    form = MenuModelForm(data=request.POST)
     if form.is_valid():
         form.save()
-        # url = reverse('rbac:menu_list')
-        # origin_params = request.GET.get("_filter")
-        # if origin_params:
-        #     url = "%s?%s" %(url,origin_params)
-
         return redirect(memory_reverse(request, 'rbac:menu_list'))
 
     return render(request, 'rbac/change.html', {'form': form})
 
 
 def menu_edit(request, pk):
-    '''
-    修改编辑菜单
+    """
+
     :param request:
     :param pk:
     :return:
-    '''
-
+    """
     obj = models.Menu.objects.filter(id=pk).first()
-
     if not obj:
         return HttpResponse('菜单不存在')
-
     if request.method == 'GET':
-        form = MenuModelForms(instance=obj)
+        form = MenuModelForm(instance=obj)
         return render(request, 'rbac/change.html', {'form': form})
 
-    form = MenuModelForms(instance=obj, data=request.POST)
+    form = MenuModelForm(instance=obj, data=request.POST)
     if form.is_valid():
         form.save()
-        # url = reverse('rbac:menu_list')
-        # origin_params = request.GET.get("_filter")
-        # if origin_params:
-        #     url = "%s?%s" %(url,origin_params)
-        # return redirect(url)
         return redirect(memory_reverse(request, 'rbac:menu_list'))
 
     return render(request, 'rbac/change.html', {'form': form})
 
 
 def menu_del(request, pk):
-    '''
-    删除菜单
+    """
+
     :param request:
     :param pk:
     :return:
-    '''
-
-    # url = reverse('rbac:menu_list')
-    # origin_params = request.GET.get("_filter")
-    # if origin_params:
-    #     url = "%s?%s" % (url, origin_params)
+    """
     url = memory_reverse(request, 'rbac:menu_list')
     if request.method == 'GET':
-        return render(request, 'rbac/delete.html', {'cancel_url': url})
+        return render(request, 'rbac/delete.html', {'cancel': url})
 
     models.Menu.objects.filter(id=pk).delete()
     return redirect(url)
@@ -143,35 +117,35 @@ def second_menu_add(request, menu_id):
     :return:
     """
 
-    menu_object = models.Menu.objects.filter(id=menu_id).first()  # 取到menu_id对象
+    menu_object = models.Menu.objects.filter(id=menu_id).first()
 
     if request.method == 'GET':
-        form = SecondMenuModelForms(initial={'menu': menu_object})
+        form = SecondMenuModelForm(initial={'menu': menu_object})
         return render(request, 'rbac/change.html', {'form': form})
 
-    form = SecondMenuModelForms(data=request.POST)
+    form = SecondMenuModelForm(data=request.POST)
     if form.is_valid():
         form.save()
-
         return redirect(memory_reverse(request, 'rbac:menu_list'))
 
     return render(request, 'rbac/change.html', {'form': form})
 
 
 def second_menu_edit(request, pk):
-    '''
+    """
     编辑二级菜单
     :param request:
-    :param pk:
+    :param pk: 当前要编辑的二级菜单
     :return:
-    '''
+    """
 
-    Permission_object = models.Permission.objects.filter(id=pk).first()
+    permission_object = models.Permission.objects.filter(id=pk).first()
+
     if request.method == 'GET':
-        form = SecondMenuModelForms(instance=Permission_object)
+        form = SecondMenuModelForm(instance=permission_object)
         return render(request, 'rbac/change.html', {'form': form})
 
-    form = SecondMenuModelForms(data=request.POST, instance=Permission_object)
+    form = SecondMenuModelForm(data=request.POST, instance=permission_object)
     if form.is_valid():
         form.save()
         return redirect(memory_reverse(request, 'rbac:menu_list'))
@@ -180,45 +154,36 @@ def second_menu_edit(request, pk):
 
 
 def second_menu_del(request, pk):
-    '''
-    删除二级菜单
+    """
     :param request:
     :param pk:
     :return:
-    '''
+    """
     url = memory_reverse(request, 'rbac:menu_list')
     if request.method == 'GET':
-        return render(request, 'rbac/delete.html', {'cancel_url': url})
+        return render(request, 'rbac/delete.html', {'cancel': url})
 
     models.Permission.objects.filter(id=pk).delete()
     return redirect(url)
 
 
 def permission_add(request, second_menu_id):
-    '''
-    添加权限菜单
+    """
+    添加权限
     :param request:
+    :param second_menu_id:
     :return:
-    '''
-
+    """
     if request.method == 'GET':
-        form = PermissionModelForms()
+        form = PermissionModelForm()
         return render(request, 'rbac/change.html', {'form': form})
 
-    form = PermissionModelForms(data=request.POST)
+    form = PermissionModelForm(data=request.POST)
     if form.is_valid():
-        second_menu_object = models.Permission.objects.filter(id=second_menu_id).first()  # 取到menu_id对象
-
+        second_menu_object = models.Permission.objects.filter(id=second_menu_id).first()
         if not second_menu_object:
-            return HttpResponse('二级菜单不存在，请重新选择')
-        # form instance 中包含用户提交的所有数据
-
+            return HttpResponse('二级菜单不存在，请重新选择！')
         form.instance.pid = second_menu_object
-
-        # instance = models.Permission(title='',name='',url='',pid=second_menu_object)
-        # instance.pid = second_menu_object
-        # instance.save()
-
         form.save()
         return redirect(memory_reverse(request, 'rbac:menu_list'))
 
@@ -226,19 +191,20 @@ def permission_add(request, second_menu_id):
 
 
 def permission_edit(request, pk):
-    '''
-     编辑权限
+    """
+    编辑权限
     :param request:
-    :param pk:当前要编辑的权限ID
+    :param pk: 当前要编辑的权限ID
     :return:
-    '''
+    """
+
     permission_object = models.Permission.objects.filter(id=pk).first()
 
     if request.method == 'GET':
-        form = PermissionModelForms(instance=permission_object)
+        form = PermissionModelForm(instance=permission_object)
         return render(request, 'rbac/change.html', {'form': form})
 
-    form = PermissionModelForms(data=request.POST, instance=permission_object)
+    form = PermissionModelForm(data=request.POST, instance=permission_object)
     if form.is_valid():
         form.save()
         return redirect(memory_reverse(request, 'rbac:menu_list'))
@@ -247,16 +213,14 @@ def permission_edit(request, pk):
 
 
 def permission_del(request, pk):
-    '''
-     删除权限
+    """
     :param request:
     :param pk:
     :return:
-    '''
-
+    """
     url = memory_reverse(request, 'rbac:menu_list')
     if request.method == 'GET':
-        return render(request, 'rbac/delete.html', {'cancel_url': url})
+        return render(request, 'rbac/delete.html', {'cancel': url})
 
     models.Permission.objects.filter(id=pk).delete()
     return redirect(url)
@@ -268,45 +232,35 @@ def multi_permissions(request):
     :param request:
     :return:
     """
-
+    post_type = request.GET.get('type')
     generate_formset_class = formset_factory(MultiAddPermissionForm, extra=0)
     update_formset_class = formset_factory(MultiEditPermissionForm, extra=0)
 
     generate_formset = None
     update_formset = None
-
-    post_type = request.GET.get('type')
-
-    if request.method == "POST" and post_type == 'generate':
-        # pass  # 批量添加
+    if request.method == 'POST' and post_type == 'generate':
+        # pass # 批量添加
         formset = generate_formset_class(data=request.POST)
-
         if formset.is_valid():
             object_list = []
-            # print(formset.cleaned_data)
             post_row_list = formset.cleaned_data
             has_error = False
             for i in range(0, formset.total_form_count()):
                 row_dict = post_row_list[i]
-
                 try:
                     new_object = models.Permission(**row_dict)
                     new_object.validate_unique()
                     object_list.append(new_object)
-
                 except Exception as e:
                     formset.errors[i].update(e)
                     generate_formset = formset
                     has_error = True
-
             if not has_error:
-                models.Permission.objects.bulk_create(object_list, batch_size=100)  # 批量增加
-
-
+                models.Permission.objects.bulk_create(object_list, batch_size=100)
         else:
             generate_formset = formset
 
-    if request.method == "POST" and post_type == 'update':
+    if request.method == 'POST' and post_type == 'update':
         # pass  # 批量更新
         formset = update_formset_class(data=request.POST)
         if formset.is_valid():
@@ -314,7 +268,6 @@ def multi_permissions(request):
             for i in range(0, formset.total_form_count()):
                 row_dict = post_row_list[i]
                 permission_id = row_dict.pop('id')
-
                 try:
                     row_object = models.Permission.objects.filter(id=permission_id).first()
                     for k, v in row_dict.items():
@@ -329,7 +282,6 @@ def multi_permissions(request):
 
     # 1. 获取项目中所有的URL
     all_url_dict = get_all_url_dict()
-
     """
     {
         'rbac:role_list':{'name': 'rbac:role_list', 'url': '/rbac/role/list/'},
@@ -337,19 +289,15 @@ def multi_permissions(request):
         ....
     }
     """
-
     router_name_set = set(all_url_dict.keys())
 
     # 2. 获取数据库中所有的URL
     permissions = models.Permission.objects.all().values('id', 'title', 'name', 'url', 'menu_id', 'pid_id')
-    # print(permissions)
     permission_dict = OrderedDict()
     permission_name_set = set()
     for row in permissions:
         permission_dict[row['name']] = row
-
         permission_name_set.add(row['name'])
-
     """
     {
         'rbac:role_list': {'id':1,'title':'角色列表',name:'rbac:role_list',url.....},
@@ -360,7 +308,6 @@ def multi_permissions(request):
 
     for name, value in permission_dict.items():
         router_row_dict = all_url_dict.get(name)  # {'name': 'rbac:role_list', 'url': '/rbac/role/list/'},
-
         if not router_row_dict:
             continue
         if value['url'] != router_row_dict['url']:
@@ -368,7 +315,6 @@ def multi_permissions(request):
 
     # 3. 应该添加、删除、修改的权限有哪些？
     # 3.1 计算出应该增加的name
-
     if not generate_formset:
         generate_name_list = router_name_set - permission_name_set
         generate_formset = generate_formset_class(
@@ -379,7 +325,6 @@ def multi_permissions(request):
     delete_row_list = [row_dict for name, row_dict in permission_dict.items() if name in delete_name_list]
 
     # 3.3 计算出应该更新的name
-
     if not update_formset:
         update_name_list = permission_name_set & router_name_set
         update_formset = update_formset_class(
@@ -387,43 +332,42 @@ def multi_permissions(request):
 
     return render(
         request,
-        'rbac/multi_permsissions.html',
+        'rbac/multi_permissions.html',
         {
             'generate_formset': generate_formset,
             'delete_row_list': delete_row_list,
             'update_formset': update_formset,
-
         }
     )
 
 
 def multi_permissions_del(request, pk):
-    '''
-     批量删除
+    """
+    批量页面的权限删除
     :param request:
     :param pk:
     :return:
-    '''
+    """
     url = memory_reverse(request, 'rbac:multi_permissions')
     if request.method == 'GET':
-        return render(request, 'rbac/delete.html', {'cancel_url': url})
+        return render(request, 'rbac/delete.html', {'cancel': url})
 
     models.Permission.objects.filter(id=pk).delete()
     return redirect(url)
 
 
 def distribute_permissions(request):
-    '''
+    """
     权限分配
     :param request:
     :return:
-    '''
+    """
 
-    # 业务中的用户表 'app.models.UserInfo'
     user_id = request.GET.get('uid')
-    user_models_class = import_string(settings.RBAC_USER_MODEL_CLASS)
-    user_object = user_models_class.objects.filter(id=user_id).first()
+    # 业务中的用户表 "app01.models.UserInfo""
+    user_model_class = import_string(settings.RBAC_USER_MODLE_CLASS)
 
+    user_object = user_model_class.objects.filter(id=user_id).first()
     if not user_object:
         user_id = None
 
@@ -431,7 +375,6 @@ def distribute_permissions(request):
     role_object = models.Role.objects.filter(id=role_id).first()
     if not role_object:
         role_id = None
-
 
     if request.method == 'POST' and request.POST.get('type') == 'role':
         role_id_list = request.POST.getlist('roles')
@@ -446,25 +389,7 @@ def distribute_permissions(request):
             return HttpResponse('请选择角色，然后再分配权限！')
         role_object.permissions.set(permission_id_list)
 
-        # 获取当前用户用户用户的所有权限
-
-        # 如果选中的角色，优先显示选中角色所拥有的权限
-        # 如果没有选择角色，才显示用户所拥有的权限
-
-    if role_object:  # 选择了角色
-        user_has_permissions = role_object.permissions.all()
-        user_has_permissions_dict = {item.id: None for item in user_has_permissions}
-
-    elif user_object:  # 未选择角色，但选择了用户
-        user_has_permissions = user_object.roles.filter(permissions__id__isnull=False).values('id',
-                                                                                                  'permissions').distinct()
-        user_has_permissions_dict = {item['permissions']: None for item in user_has_permissions}
-    else:
-        user_has_permissions_dict = {}
-
-
     # 获取当前用户拥有的所有角色
-
     if user_id:
         user_has_roles = user_object.roles.all()
     else:
@@ -472,69 +397,70 @@ def distribute_permissions(request):
 
     user_has_roles_dict = {item.id: None for item in user_has_roles}
 
+    # 获取当前用户用户用户的所有权限
 
-    all_user_list = user_models_class.objects.all()
+    # 如果选中的角色，优先显示选中角色所拥有的权限
+    # 如果没有选择角色，才显示用户所拥有的权限
+    if role_object:  # 选择了角色
+        user_has_permissions = role_object.permissions.all()
+        user_has_permissions_dict = {item.id: None for item in user_has_permissions}
+
+    elif user_object:  # 未选择角色，但选择了用户
+        user_has_permissions = user_object.roles.filter(permissions__id__isnull=False).values('id',
+                                                                                              'permissions').distinct()
+        user_has_permissions_dict = {item['permissions']: None for item in user_has_permissions}
+    else:
+        user_has_permissions_dict = {}
+
+    all_user_list = user_model_class.objects.all()
+
     all_role_list = models.Role.objects.all()
 
-    menu_permsissions_list = []
+    menu_permission_list = []
 
-    '''
-    <QuerySet [{'id': 1, 'title': '信息管理', 'children': [{'id': 1, 'title': '客户列表', 'menu_id': 1, 'children': []}, {'id': 7, 'title': '账单列表', 'menu_id': 1, 'children': []}]}, {'id': 10, 'title': '信息中心', 'children': [{'id': 19, 'title': '系统', 'menu_id': 10, 'children': []}]}, {'id': 11, 'title': '权限管理', 'children': [{'id': 21, 'title': '角色列表', 'menu_id': 11, 'children': []}, {'id': 25, 'title': '用户列表', 'menu_id': 11, 'children': []}, {'id': 30, 'title': '菜单列表', 'menu_id': 11, 'children': []}]}]>
-    '''
-
-    # 所有菜单（一级菜单）
-
-    all_menu_list = models.Menu.objects.values('id','title')
-
+    # 所有的菜单（一级菜单）
+    all_menu_list = models.Menu.objects.values('id', 'title')
     """
     [
-        {'id:1,title:菜单1,'children':[{id:1,title:x1, menu_id:1,},{id:1,title:x1, menu_id:1,}]},
-        {'id:2,title:菜单2,'children':[{id:2,title:x2, menu_id:2,},{id:2,title:x2, menu_id:2,}]},
-        {'id:3,title:菜单3,'children':[{id:2,title:x2, menu_id:3,} ,]},
+        {id:1,title:菜单1,children:[{id:1,title:x1, menu_id:1,'children':[{id:11,title:x2,pid:1},] },{id:2,title:x1, menu_id:1 },]},
+        {id:2,title:菜单2,children:[{id:3,title:x1, menu_id:2 },{id:5,title:x1, menu_id:2 },]},
+        {id:3,title:菜单3,children:[{id:4,title:x1, menu_id:3 },]},
     ]
     """
-
     all_menu_dict = {}
-
     """
-    [
-        {'id:1,title:菜单1,'children':[{id:1,title:x1, menu_id:1,children':[{id:1,title:x2,pid:1}]},{id:1,title:x1, menu_id:1,}]},
-        {'id:2,title:菜单2,'children':[{id:2,title:x2, menu_id:2,children':[]},{id:5,title:x1, menu_id:2,children':[]},]},
-        {'id:3,title:菜单3,'children':[{id:2,title:x2, menu_id:3,children':[] },]},
-    ]
-    """
-
+       {
+           1:{id:1,title:菜单1,children:[{id:1,title:x1, menu_id:1,children:[{id:11,title:x2,pid:1},] },{id:2,title:x1, menu_id:1,children:[] },]},
+           2:{id:2,title:菜单2,children:[{id:3,title:x1, menu_id:2,children:[] },{id:5,title:x1, menu_id:2,children:[] },]},
+           3:{id:3,title:菜单3,children:[{id:4,title:x1, menu_id:3,children:[] },]},
+       }
+       """
     for item in all_menu_list:
         item['children'] = []
         all_menu_dict[item['id']] = item
 
-
-
-
     # 所有二级菜单
-
-    all_second_menu_list = models.Permission.objects.filter(menu__isnull=False).values('id','title','menu_id')
+    all_second_menu_list = models.Permission.objects.filter(menu__isnull=False).values('id', 'title', 'menu_id')
 
     """
     [
-      {id:1,title:x1, menu_id:1,children:[{id:1,title:x2,pid:1},]},
-      {id:1,title:x1, menu_id:1,children:[]},
-      {id:1,title:x1, menu_id:2,children:[]},
-      {id:1,title:x1, menu_id:3,children:[]},
-      {id:1,title:x1, menu_id:3,children:[]}, 
+        {id:1,title:x1, menu_id:1,children:[{id:11,title:x2,pid:1},] },   
+        {id:2,title:x1, menu_id:1,children:[] },
+        {id:3,title:x1, menu_id:2,children:[] },
+        {id:4,title:x1, menu_id:3,children:[] },
+        {id:5,title:x1, menu_id:2,children:[] },
     ]
     """
-
     all_second_menu_dict = {}
     """
-    [
-      1:{id:1,title:x1, menu_id:1,children:[]},
-      2:{id:1,title:x1, menu_id:1,children:[]},
-      3:{id:1,title:x1, menu_id:2,children:[]},
-      4:{id:1,title:x1, menu_id:3,children:[]},
-      5:{id:1,title:x1, menu_id:3,children:[]}, 
-    ]
-    """
+        {
+            1:{id:1,title:x1, menu_id:1,children:[{id:11,title:x2,pid:1},] },   
+            2:{id:2,title:x1, menu_id:1,children:[] },
+            3:{id:3,title:x1, menu_id:2,children:[] },
+            4:{id:4,title:x1, menu_id:3,children:[] },
+            5:{id:5,title:x1, menu_id:2,children:[] },
+        }
+        """
     for row in all_second_menu_list:
         row['children'] = []
         all_second_menu_dict[row['id']] = row
@@ -542,17 +468,16 @@ def distribute_permissions(request):
         menu_id = row['menu_id']
         all_menu_dict[menu_id]['children'].append(row)
 
-
-
-    # 所有三级菜单
+    # 所有三级菜单（不能做菜单的权限）
     all_permission_list = models.Permission.objects.filter(menu__isnull=True).values('id', 'title', 'pid_id')
     """
     [
-      {id:11,title:x1, pid_id:1,},
-      {id:12,title:x1, pid_id:2,},
-      {id:13,title:x1, pid_id:3,},
-      {id:14,title:x1, pid_id:4,},
-      {id:15,title:x1, pid_id:5,}, 
+        {id:11,title:x2,pid:1},
+        {id:12,title:x2,pid:1},
+        {id:13,title:x2,pid:2},
+        {id:14,title:x2,pid:3},
+        {id:15,title:x2,pid:4},
+        {id:16,title:x2,pid:5},
     ]
     """
     for row in all_permission_list:
@@ -561,28 +486,25 @@ def distribute_permissions(request):
             continue
         all_second_menu_dict[pid]['children'].append(row)
 
-
-    '''
+    """
     [
         {
-         id，：2
-        'title':业务管理
-         children:[
-                {  
-                  'id':11,
-                  'title':'账单列表',
-                  childram:[
-                  {
-                   'id':12,
-                    'title':'添加账单',
-                        },]
-                    },
-                 {'id':11,'title':'客户列表',},
+            id:1,
+            title:'业务管理'
+            children:[
+                {
+                    'id':11, 
+                    title:'账单列表',
+                    children:[
+                        {'id':12,title:'添加账单'}
+                    ]
+                },
+                {'id':11, title:'客户列表'},
             ]
-        }
+        },
+        
     ]
-    '''
-    # print(all_menu_list)
+    """
 
     return render(
         request,
@@ -590,11 +512,10 @@ def distribute_permissions(request):
         {
             'user_list': all_user_list,
             'role_list': all_role_list,
-            'all_menu_list':all_menu_list,
-            'user_id':user_id,
-            'role_id':role_id,
-            'user_has_roles_dict':user_has_roles_dict,
-            'user_has_permissions_dict':user_has_permissions_dict,
-
+            'all_menu_list': all_menu_list,
+            'user_id': user_id,
+            'role_id': role_id,
+            'user_has_roles_dict': user_has_roles_dict,
+            'user_has_permissions_dict': user_has_permissions_dict,
         }
     )

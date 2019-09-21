@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
 from django.conf import settings
 
 
@@ -52,6 +54,5 @@ def init_permission(current_user, request):
                 'children': [node, ]
             }
 
-    request.session[settings.PERMISSION_SISSION_KEY] = permission_dict
-    request.session[settings.MENU_SISSION_KEY] = menu_dict
-
+    request.session[settings.PERMISSION_SESSION_KEY] = permission_dict
+    request.session[settings.MENU_SESSION_KEY] = menu_dict
